@@ -23,9 +23,10 @@
 
 #include <bitset>
 
-#include <taglib/toolkit/tfile.h>
-#include <taglib/toolkit/tbytevector.h>
-#include <taglib/toolkit/tstring.h>
+#include <tfile.h>
+#include <tbytevector.h>
+#include <tstring.h>
+#include <trefcounter.h>
 
 #include "dffheader.h"
 #include "dfffile.h"
@@ -33,6 +34,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+
+using namespace TagLib;
 
 static void LOG(const char *fmt, ...)
 {

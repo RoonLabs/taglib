@@ -23,12 +23,15 @@
 
 #include <bitset>
 
-#include <taglib/toolkit/tbytevector.h>
-#include <taglib/toolkit/tstring.h>
+#include <tbytevector.h>
+#include <tstring.h>
+#include <trefcounter.h>
 
 #include "dsfheader.h"
 
-class DSFHeader::HeaderPrivate : public TagLib::RefCounter
+using namespace TagLib;
+
+class DSFHeader::HeaderPrivate : public RefCounter
 {
 public:
   HeaderPrivate() :
