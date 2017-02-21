@@ -47,7 +47,6 @@ public:
     bitrateMinimum(0) {}
 
   int length;
-  int lengthms;
   int bitrate;
   int sampleRate;
   int channels;
