@@ -81,12 +81,17 @@ DSFProperties::~DSFProperties()
 
 int DSFProperties::length() const
 {
-  return d->sampleCount / d->sampleRate;
+  return lengthInSeconds();
 }
 
-int DSFProperties::lengthMs() const
+int DSFProperties::lengthInSeconds() const
 {
-  return (int)(d->sampleCount  * 1000.0 / d->sampleRate);
+  return d->length / 1000;
+}
+
+int DSFProperties::lengthInMilliseconds() const
+{
+  return d->length;
 }
 
 int DSFProperties::bitrate() const
@@ -158,6 +163,7 @@ void DSFProperties::read()
 
   d->sampleRate = h.sampleRate();
   d->sampleCount = h.sampleCount();
+  d->length = (int)(d->sampleCount  * 1000.0 / d->sampleRate);
   d->bitsPerSample = h.bitsPerSample();
   d->channels = h.channelNum();
   d->version = h.version();

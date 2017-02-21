@@ -51,11 +51,35 @@ class DFFProperties : public TagLib::AudioProperties
    * Destroys this DFF Properties instance.
    */
   virtual ~DFFProperties();
+  
+  /*!
+   * Returns the length of the file in seconds.  The length is rounded down to
+   * the nearest whole second.
+   *
+   * \note This method is just an alias of lengthInSeconds().
+   *
+   * \deprecated
+   */
+  virtual int length() const;
+
+  /*!
+   * Returns the length of the file in seconds.  The length is rounded down to
+   * the nearest whole second.
+   *
+   * \see lengthInMilliseconds()
+   */
+  // BIC: make virtual
+  int lengthInSeconds() const;
+
+  /*!
+   * Returns the length of the file in milliseconds.
+   *
+   * \see lengthInSeconds()
+   */
+  // BIC: make virtual
+  int lengthInMilliseconds() const;
 
   // Reimplementations.
-
-  virtual int length() const;
-  virtual int lengthMs() const;
   virtual int bitrate() const;
   virtual int sampleRate() const;
   virtual int channels() const;
