@@ -57,20 +57,20 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::File::File(FileName file, bool readProperties, Properties::ReadStyle) :
+RIFF::AIFF::File::File(FileName file, bool readProperties, Properties::ReadStyle propertiesStyle) :
   RIFF::File(file, BigEndian),
   d(new FilePrivate())
 {
   if(isOpen())
-    read(readProperties);
+    read(readProperties, propertiesStyle);
 }
 
-RIFF::AIFF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle) :
+RIFF::AIFF::File::File(IOStream *stream, bool readProperties, Properties::ReadStyle propertiesStyle) :
   RIFF::File(stream, BigEndian),
   d(new FilePrivate())
 {
   if(isOpen())
-    read(readProperties);
+    read(readProperties, propertiesStyle);
 }
 
 RIFF::AIFF::File::~File()
@@ -138,7 +138,7 @@ bool RIFF::AIFF::File::hasID3v2Tag() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void RIFF::AIFF::File::read(bool readProperties)
+void RIFF::AIFF::File::read(bool readProperties, Properties::ReadStyle propertiesStyle)
 {
   for(unsigned int i = 0; i < chunkCount(); ++i) {
     const ByteVector name = chunkName(i);
@@ -157,5 +157,5 @@ void RIFF::AIFF::File::read(bool readProperties)
     d->tag = new ID3v2::Tag();
 
   if(readProperties)
-    d->properties = new Properties(this, Properties::Average);
+    d->properties = new Properties(this, propertiesStyle, this->audioSignature());
 }

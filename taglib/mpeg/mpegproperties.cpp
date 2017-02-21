@@ -31,6 +31,7 @@
 #include "xingheader.h"
 #include "apetag.h"
 #include "apefooter.h"
+#include <roon_taglib_utils.h>
 
 using namespace TagLib;
 
@@ -66,6 +67,7 @@ public:
   bool protectionEnabled;
   bool isCopyrighted;
   bool isOriginal;
+  ByteVector signature;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -149,21 +151,68 @@ bool MPEG::Properties::isOriginal() const
   return d->isOriginal;
 }
 
+ByteVector MPEG::Properties::signature() const
+{
+  return d->signature;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
 void MPEG::Properties::read(File *file)
 {
-  // Only the first valid frame is required if we have a VBR header.
+  // Since we've likely just looked for the ID3v1 tag, start at the end of the
+  // file where we're least likely to have to have to move the disk head.
 
-  const long firstFrameOffset = file->firstFrameOffset();
-  if(firstFrameOffset < 0) {
-    debug("MPEG::Properties::read() -- Could not find an MPEG frame in the stream.");
+  long lastFrameOffset = file->lastFrameOffset();
+
+  if(lastFrameOffset < 0) {
+    debug("MPEG::Properties::read() -- Could not find a valid last MPEG frame in the stream.");
     return;
   }
 
-  const Header firstHeader(file, firstFrameOffset, false);
+  file->seek(lastFrameOffset);
+  Header lastHeader(file->readBlock(4));
+
+  long firstFrameOffset = file->firstFrameOffset();
+
+  if(firstFrameOffset < 0) {
+    debug("MPEG::Properties::read() -- Could not find a valid first MPEG frame in the stream.");
+    return;
+  }
+
+  if(!lastHeader.isValid()) {
+
+    long pos = lastFrameOffset;
+
+    while(pos > firstFrameOffset) {
+
+      pos = file->previousFrameOffset(pos);
+
+      if(pos < 0)
+        break;
+
+      file->seek(pos);
+      Header header(file->readBlock(4));
+
+      if(header.isValid()) {
+        lastHeader = header;
+        lastFrameOffset = pos;
+        break;
+      }
+    }
+  }
+
+  // Now jump back to the front of the file and read what we need from there.
+
+  file->seek(firstFrameOffset);
+  Header firstHeader(file->readBlock(4));
+
+  if(!firstHeader.isValid() || !lastHeader.isValid()) {
+    debug("MPEG::Properties::read() -- Page headers were invalid.");
+    return;
+  }
 
   // Check for a VBR header that will help us in gathering information about a
   // VBR stream.
@@ -195,15 +244,6 @@ void MPEG::Properties::read(File *file)
 
     d->bitrate = firstHeader.bitrate();
 
-    // Look for the last MPEG audio frame to calculate the stream length.
-
-    const long lastFrameOffset = file->lastFrameOffset();
-    if(lastFrameOffset < 0) {
-      debug("MPEG::Properties::read() -- Could not find an MPEG frame in the stream.");
-      return;
-    }
-
-    const Header lastHeader(file, lastFrameOffset, false);
     const long streamLength = lastFrameOffset - firstFrameOffset + lastHeader.frameLength();
     if(streamLength > 0)
       d->length = static_cast<int>(streamLength * 8.0 / d->bitrate + 0.5);
@@ -217,4 +257,5 @@ void MPEG::Properties::read(File *file)
   d->channelMode       = firstHeader.channelMode();
   d->isCopyrighted     = firstHeader.isCopyrighted();
   d->isOriginal        = firstHeader.isOriginal();
+  d->signature         = taglib_make_signature(file, firstFrameOffset, lastFrameOffset - firstFrameOffset);
 }

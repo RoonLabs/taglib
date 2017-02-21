@@ -221,7 +221,7 @@ void RIFF::WAV::File::read(bool readProperties)
     d->tag.set(InfoIndex, new RIFF::Info::Tag());
 
   if(readProperties)
-    d->properties = new Properties(this, Properties::Average);
+    d->properties = new Properties(this, Properties::Average, this->audioSignature());
 }
 
 void RIFF::WAV::File::removeTagChunks(TagTypes tags)

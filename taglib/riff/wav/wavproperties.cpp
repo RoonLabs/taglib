@@ -58,30 +58,32 @@ public:
   int channels;
   int bitsPerSample;
   unsigned int sampleFrames;
+  ByteVector signature;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::WAV::Properties::Properties(const ByteVector &, ReadStyle style) :
+RIFF::WAV::Properties::Properties(const ByteVector &, ReadStyle style, const ByteVector &signature) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
   debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
 }
 
-RIFF::WAV::Properties::Properties(const ByteVector &, unsigned int, ReadStyle style) :
+RIFF::WAV::Properties::Properties(const ByteVector &, unsigned int, ReadStyle style, const ByteVector &signature) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
   debug("RIFF::WAV::Properties::Properties() -- This constructor is no longer used.");
 }
 
-TagLib::RIFF::WAV::Properties::Properties(File *file, ReadStyle style) :
+TagLib::RIFF::WAV::Properties::Properties(File *file, ReadStyle style, const ByteVector &signature) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
+  d->signature = signature;
   read(file);
 }
 
@@ -138,6 +140,11 @@ unsigned int RIFF::WAV::Properties::sampleFrames() const
 int RIFF::WAV::Properties::format() const
 {
   return d->format;
+}
+
+ByteVector RIFF::WAV::Properties::signature() const
+{
+  return d->signature;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

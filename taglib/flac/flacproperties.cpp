@@ -28,6 +28,7 @@
 
 #include "flacproperties.h"
 #include "flacfile.h"
+#include <roon_taglib_utils.h>
 
 using namespace TagLib;
 
@@ -170,7 +171,4 @@ void FLAC::Properties::read(const ByteVector &data, long streamLength)
     d->length  = static_cast<int>(length + 0.5);
     d->bitrate = static_cast<int>(streamLength * 8.0 / length + 0.5);
   }
-
-  if(data.size() >= pos + 16)
-    d->signature = data.mid(pos, 16);
 }

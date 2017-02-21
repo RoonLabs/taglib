@@ -52,13 +52,13 @@ namespace TagLib {
          *
          * \deprecated
          */
-        Properties(const ByteVector &data, ReadStyle style);
+        Properties(const ByteVector &data, ReadStyle style, const ByteVector &signature);
 
         /*!
          * Create an instance of AIFF::Properties with the data read from the
          * AIFF::File \a file.
          */
-        Properties(File *file, ReadStyle style);
+        Properties(File *file, ReadStyle style, const ByteVector &signature);
 
         /*!
          * Destroys this AIFF::Properties instance.
@@ -119,6 +119,12 @@ namespace TagLib {
          *
          * \deprecated
          */
+
+        /*!
+         * Returns the SHA1 "signature" of the audio content
+         */
+        virtual ByteVector signature() const;
+        
         int sampleWidth() const;
 
         /*!

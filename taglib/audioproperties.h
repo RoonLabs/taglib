@@ -27,6 +27,7 @@
 #define TAGLIB_AUDIOPROPERTIES_H
 
 #include "taglib_export.h"
+#include "tbytevector.h"
 
 namespace TagLib {
 
@@ -102,6 +103,10 @@ namespace TagLib {
      * Returns the number of audio channels.
      */
     virtual int channels() const = 0;
+
+    virtual ByteVector signature() const {
+      return ByteVector::null;
+    }
 
   protected:
 

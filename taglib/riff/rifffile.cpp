@@ -29,6 +29,7 @@
 #include <tbytevector.h>
 #include <tdebug.h>
 #include <tstring.h>
+#include <roon_taglib_utils.h>
 
 #include "rifffile.h"
 #include "riffutils.h"
@@ -57,6 +58,7 @@ public:
   long sizeOffset;
 
   std::vector<Chunk> chunks;
+  ByteVector audio_signature;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -275,6 +277,11 @@ void RIFF::File::removeChunk(const ByteVector &name)
   }
 }
 
+ByteVector RIFF::File::audioSignature() const
+{
+    return d->audio_signature;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -332,6 +339,13 @@ void RIFF::File::read()
     }
 
     d->chunks.push_back(chunk);
+  }
+
+  for (uint i = 0; i < chunkCount(); i++) {
+    if (chunkName(i) == "SSND" || // aiff data chunk
+        chunkName(i) == "data") { // wave data chunk
+      d->audio_signature = taglib_make_signature(this, chunkOffset(i), chunkDataSize(i));
+    }
   }
 }
 

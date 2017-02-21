@@ -137,6 +137,11 @@ namespace TagLib {
        */
       bool isOriginal() const;
 
+      /*!
+       * Returns the SHA1 signature of the audio content
+       */
+      virtual ByteVector signature() const;
+      
     private:
       Properties(const Properties &);
       Properties &operator=(const Properties &);

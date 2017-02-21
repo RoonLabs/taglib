@@ -51,23 +51,26 @@ public:
   String compressionName;
 
   unsigned int sampleFrames;
+
+  ByteVector signature;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-RIFF::AIFF::Properties::Properties(const ByteVector &, ReadStyle style) :
+RIFF::AIFF::Properties::Properties(const ByteVector &, ReadStyle style, const ByteVector &signature) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
   debug("RIFF::AIFF::Properties::Properties() - This constructor is no longer used.");
 }
 
-RIFF::AIFF::Properties::Properties(File *file, ReadStyle style) :
+RIFF::AIFF::Properties::Properties(File *file, ReadStyle style, const ByteVector &signature) :
   AudioProperties(style),
   d(new PropertiesPrivate())
 {
+  d->signature = signature;
   read(file);
 }
 
@@ -119,6 +122,11 @@ int RIFF::AIFF::Properties::sampleWidth() const
 unsigned int RIFF::AIFF::Properties::sampleFrames() const
 {
   return d->sampleFrames;
+}
+
+ByteVector RIFF::AIFF::Properties::signature() const
+{
+  return d->signature;
 }
 
 bool RIFF::AIFF::Properties::isAiffC() const

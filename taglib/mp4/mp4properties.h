@@ -97,6 +97,11 @@ namespace TagLib {
       virtual int bitsPerSample() const;
 
       /*!
+       * Returns the SHA1 signature of the audio content
+       */
+      virtual ByteVector signature() const;
+      
+      /*!
        * Returns whether or not the file is encrypted.
        */
       bool isEncrypted() const;

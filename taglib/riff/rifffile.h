@@ -139,6 +139,8 @@ namespace TagLib {
        */
       void removeChunk(const ByteVector &name);
 
+      ByteVector audioSignature() const;
+
     private:
       File(const File &);
       File &operator=(const File &);

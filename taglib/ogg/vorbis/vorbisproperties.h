@@ -110,6 +110,11 @@ namespace TagLib {
       virtual int channels() const;
 
       /*!
+       * Returns the SHA1 "signature" of the audio content
+       */
+      virtual ByteVector signature() const;
+
+      /*!
        * Returns the Vorbis version, currently "0" (as specified by the spec).
        */
       int vorbisVersion() const;

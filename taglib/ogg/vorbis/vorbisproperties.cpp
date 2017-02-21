@@ -47,6 +47,7 @@ public:
     bitrateMinimum(0) {}
 
   int length;
+  int lengthms;
   int bitrate;
   int sampleRate;
   int channels;
@@ -54,6 +55,7 @@ public:
   int bitrateMaximum;
   int bitrateNominal;
   int bitrateMinimum;
+  ByteVector signature;
 };
 
 namespace TagLib {
@@ -128,6 +130,11 @@ int Vorbis::Properties::bitrateNominal() const
 int Vorbis::Properties::bitrateMinimum() const
 {
   return d->bitrateMinimum;
+}
+
+ByteVector Vorbis::Properties::signature() const
+{
+  return d->signature;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

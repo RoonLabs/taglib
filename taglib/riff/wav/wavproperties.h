@@ -55,7 +55,7 @@ namespace TagLib {
          *
          * \deprecated
          */
-        Properties(const ByteVector &data, ReadStyle style);
+        Properties(const ByteVector &data, ReadStyle style, const ByteVector &signature);
 
         /*!
          * Create an instance of WAV::Properties with the data read from the
@@ -63,13 +63,13 @@ namespace TagLib {
          *
          * \deprecated
          */
-        Properties(const ByteVector &data, unsigned int streamLength, ReadStyle style);
+        Properties(const ByteVector &data, unsigned int streamLength, ReadStyle style, const ByteVector &signature);
 
         /*!
          * Create an instance of WAV::Properties with the data read from the
          * WAV::File \a file.
          */
-        Properties(File *file, ReadStyle style);
+        Properties(File *file, ReadStyle style, const ByteVector &signature);
 
         /*!
          * Destroys this WAV::Properties instance.
@@ -121,6 +121,12 @@ namespace TagLib {
         /*!
          * Returns the number of bits per audio sample.
          */
+
+        /*!
+         * Returns the SHA1 signature of the audio content
+         */
+        virtual ByteVector signature() const;
+        
         int bitsPerSample() const;
 
         /*!
