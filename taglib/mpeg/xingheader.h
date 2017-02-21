@@ -111,6 +111,12 @@ namespace TagLib {
        *
        * \deprecated Always returns 0.
        */
+
+      /*!
+       * Returns the Lame encoder info, if any.
+       */
+      String encoderInfo() const;
+      
       static int xingHeaderOffset(TagLib::MPEG::Header::Version v,
                                   TagLib::MPEG::Header::ChannelMode c);
 
