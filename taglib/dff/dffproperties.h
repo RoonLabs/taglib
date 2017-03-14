@@ -27,78 +27,80 @@
 
 #include "dffheader.h"
 
+namespace TagLib {
+  namespace DFF {
+    class File;
 
-class DFFFile;
+    //! An implementation of audio property reading for DFF
 
-//! An implementation of audio property reading for DFF
+    /*!
+     * This reads the data from a DFF stream found in the
+     * AudioProperties API.
+     */
 
-/*!
- * This reads the data from a DFF stream found in the
- * AudioProperties API.
- */
+    class TAGLIB_EXPORT AudioProperties : public TagLib::AudioProperties
+    {
+    public:
+      /*!
+       * Create an instance of DFF::Properties with the data read from the
+       * DFF::File \a file.
+       */
+      AudioProperties(File *file, ReadStyle style = Average);
 
-class DFFProperties : public TagLib::AudioProperties
-{
- public:
-  /*!
-   * Create an instance of DFF::Properties with the data read from the
-   * DFF::File \a file.
-   */
-  DFFProperties(DFFFile *file, 
-		TagLib::AudioProperties::ReadStyle style = Average);
+      /*!
+       * Destroys this DFF Properties instance.
+       */
+      virtual ~AudioProperties();
 
-  /*!
-   * Destroys this DFF Properties instance.
-   */
-  virtual ~DFFProperties();
+      // Reimplementations.
 
-  // Reimplementations.
+      virtual int length() const;
+      virtual int lengthInSeconds() const;
+      virtual int lengthInMilliseconds() const;
+      virtual int bitrate() const;
+      virtual int sampleRate() const;
+      virtual int channels() const;
+      virtual TagLib::ByteVector signature() const;
 
-  virtual int length() const;
-  virtual int lengthMs() const;
-  virtual int bitrate() const;
-  virtual int sampleRate() const;
-  virtual int channels() const;
-  virtual TagLib::ByteVector signature() const;
+      /*!
+       * Returns the DFF Version of the file.
+       */
+      unsigned version() const;
 
-  /*!
-   * Returns the DFF Version of the file.
-   */
-  unsigned version() const;
+      /*!
+       * Returns the channel type
+       */
+      unsigned short channelType() const;
 
-  /*!
-   * Returns the channel type
-   */
-  unsigned short channelType() const;
+      /*!
+       * Returns the ID3v2 offset in the file
+       */
+      unsigned long long ID3v2Offset() const;
 
-  /*!
-   * Returns the ID3v2 offset in the file
-   */
-  unsigned long long ID3v2Offset() const;
+      /*!
+       * Returns the file size
+       */
+      unsigned long long fileSize() const;
 
-  /*!
-   * Returns the file size
-   */
-  unsigned long long fileSize() const;
+      /*!
+       * Returns the sample count
+       */
+      unsigned long long sampleCount() const;
 
-  /*!
-   * Returns the sample count
-   */
-  unsigned long long sampleCount() const;
+      /*!
+       * Returns the bits per sample
+       */
+      int bitsPerSample() const;
 
-  /*!
-   * Returns the bits per sample
-   */
-  int bitsPerSample() const;
+    private:
+      AudioProperties(const AudioProperties &);
+      AudioProperties &operator=(const AudioProperties &);
 
- private:
-  DFFProperties(const DFFProperties &);
-  DFFProperties &operator=(const DFFProperties &);
+      void read();
 
-  void read();
-
-  class PropertiesPrivate;
-  PropertiesPrivate *d;
-};
-
+      class PropertiesPrivate;
+      PropertiesPrivate *d;
+    };
+  }
+}
 #endif

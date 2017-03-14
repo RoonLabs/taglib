@@ -34,6 +34,8 @@
 #include <stdarg.h>
 #include <string.h>
 
+using namespace TagLib;
+
 static void LOG(const char *fmt, ...)
 {
     /*
@@ -74,7 +76,7 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-DFFHeader::DFFHeader(DFFFile *file)
+DFFHeader::DFFHeader(File *file)
 {
   d = new HeaderPrivate;
   parse(file);
@@ -173,7 +175,7 @@ static uint64_t decodebe64(const TagLib::ByteVector& bv, int off) {
     return ((uint64_t)b[off + 0] << 56) | ((uint64_t)b[off + 1] << 48) | ((uint64_t)b[off + 2] << 40) | ((uint64_t)b[off + 3] << 32) | ((uint64_t)b[off + 4] << 24) | ((uint64_t)b[off + 5] << 16) | ((uint64_t)b[off + 6] <<  8) | ((uint64_t)b[off + 7] <<  0); 
 }
 
-void DFFHeader::parse(DFFFile *file)
+void DFFHeader::parse(File *file)
 {
     LOG("parse");
     int64_t chunk_size, chunk_end;

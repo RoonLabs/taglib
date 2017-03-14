@@ -22,88 +22,82 @@
 #ifndef TAGLIB_DFFFILE_H
 #define TAGLIB_DFFFILE_H
 
-#include <taglib/toolkit/tfile.h>
-#include <taglib/tag.h>
+#include "tfile.h"
+#include "tag.h"
 
 #include "dffproperties.h"
 
-
+namespace TagLib {
 //! An implementation of TagLib::File with DFF (DSD) specific methods
 //
 //! An DFF file class with some useful methods specific to DFF
 
-class DFFFile : public TagLib::File
-{
- public:
-  /*!
-   * Constructs an DFF file from \a file.  If \a readProperties is true the
-   * file's audio properties will also be read.
-   *
-   * \note In the current implementation, \a propertiesStyle is ignored.
-   *
-   * \deprecated This constructor will be dropped in favor of the one below
-   * in a future version.
-   */
-  DFFFile(TagLib::FileName file, bool readProperties = true,
-       TagLib::AudioProperties::ReadStyle propertiesStyle 
-       = TagLib::AudioProperties::Average);
+  namespace DFF {
+  
+    class TAGLIB_EXPORT File : public TagLib::File
+    {
+    public:
+      /*!
+       * Constructs an DFF file from \a file.  If \a readProperties is true the
+       * file's audio properties will also be read.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
+       *
+       * \deprecated This constructor will be dropped in favor of the one below
+       * in a future version.
+       */
+      File(FileName file, bool readProperties = true,
+           AudioProperties::ReadStyle propertiesStyle 
+           = AudioProperties::Average);
 
 
-  /*!
-   * Constructs an DFF file from \a stream.  If \a readProperties is true the
-   * file's audio properties will also be read.
-   *
-   * \note TagLib will *not* take ownership of the stream, the caller is
-   * responsible for deleting it after the File object.
-   *
-   * \note In the current implementation, \a propertiesStyle is ignored.
-   */
-  DFFFile(TagLib::IOStream *stream, 
-	  bool readProperties = true,
-	  TagLib::AudioProperties::ReadStyle propertiesStyle = 
-	  TagLib::AudioProperties::Average);
+      /*!
+       * Constructs an DFF file from \a stream.  If \a readProperties is true the
+       * file's audio properties will also be read.
+       *
+       * \note TagLib will *not* take ownership of the stream, the caller is
+       * responsible for deleting it after the File object.
+       *
+       * \note In the current implementation, \a propertiesStyle is ignored.
+       */
+      File(IOStream *stream, 
+           bool readProperties = true,
+           AudioProperties::ReadStyle propertiesStyle = 
+           AudioProperties::Average);
 
-  /*!
-   * Destroys this instance of the File.
-   */
-  virtual ~DFFFile();
+      /*!
+       * Destroys this instance of the File.
+       */
+      virtual ~File();
 
-  /*!
-   * Implements the reading part of the unified property interface.
-   */
-  TagLib::PropertyMap properties() const;
+      /*!
+       * Returns the DFF::Properties for this file.  If no audio properties
+       * were read then this will return a null pointer.
+       */
+      virtual AudioProperties *audioProperties() const;
 
-  // NEEDED??
-  void removeUnsupportedProperties(const TagLib::StringList &properties);
+      /*!
+       * Returns a pointer to a tag
+       */
+      virtual Tag *tag() const;
 
-  /*!
-   * Returns the DFF::Properties for this file.  If no audio properties
-   * were read then this will return a null pointer.
-   */
-  virtual TagLib::AudioProperties *audioProperties() const;
+      /*!
+       * This does nothing and returns false because DFF files do not support tags.
+       *
+       * \see save(int tags)
+       */
+      virtual bool save();
 
-  /*!
-   * Returns a pointer to a tag
-   */
-  virtual TagLib::Tag *tag() const;
+    private:
+      File(const File &);
+      File &operator=(const File &);
 
-  /*!
-   * This does nothing and returns false because DFF files do not support tags.
-   *
-   * \see save(int tags)
-   */
-  virtual bool save();
+      // Read the actual audio file for tags
+      void read(bool readProperties, AudioProperties::ReadStyle propertiesStyle);
 
- private:
-  DFFFile(const DFFFile &);
-  DFFFile &operator=(const DFFFile &);
-
-  // Read the actual audio file for tags
-  void read(bool readProperties, 
-	    TagLib::AudioProperties::ReadStyle propertiesStyle);
-
-  class FilePrivate;
-  FilePrivate *d;
-};
-
+      class FilePrivate;
+      FilePrivate *d;
+    };
+  }
+}
 #endif

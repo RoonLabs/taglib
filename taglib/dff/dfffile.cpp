@@ -21,16 +21,16 @@
 
 #include <stdint.h>
 
-#include <taglib/toolkit/tpropertymap.h>
+#include <tpropertymap.h>
 
 #include <bitset>
 
 #include "dfffile.h"
 #include "dffheader.h"
 
-//using namespace TagLib;
+using namespace TagLib;
 
-class DFFFile::FilePrivate
+class DFF::File::FilePrivate
 {
 public:
   FilePrivate() :
@@ -43,15 +43,15 @@ public:
     if (properties) delete properties;
   }
   unsigned long long fileSize;
-  DFFProperties *properties;
+  AudioProperties *properties;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-DFFFile::DFFFile(TagLib::FileName file, bool readProperties,
-		 TagLib::AudioProperties::ReadStyle propertiesStyle) 
+DFF::File::File(FileName file, bool readProperties,
+		AudioProperties::ReadStyle propertiesStyle) 
   : TagLib::File(file)
 {
   d = new FilePrivate;
@@ -60,7 +60,7 @@ DFFFile::DFFFile(TagLib::FileName file, bool readProperties,
     read(readProperties, propertiesStyle);
 }
 
-DFFFile::DFFFile(TagLib::IOStream *stream, 
+DFF::File::File(TagLib::IOStream *stream, 
 		 bool readProperties, 
 		 TagLib::AudioProperties::ReadStyle propertiesStyle) :
   TagLib::File(stream)
@@ -72,46 +72,38 @@ DFFFile::DFFFile(TagLib::IOStream *stream,
 }
 
 
-DFFFile::~DFFFile()
+DFF::File::~File()
 {
   delete d;
 }
 
-TagLib::PropertyMap DFFFile::properties() const
-{
-  return TagLib::PropertyMap();
-}
-
-void DFFFile::removeUnsupportedProperties(const TagLib::StringList &properties)
-{
-}
-
-TagLib::AudioProperties *DFFFile::audioProperties() const
+DFF::AudioProperties *DFF::File::audioProperties() const
 {
   return d->properties;
 }
 
-bool DFFFile::save() 
+bool DFF::File::save() 
 {
     std::cerr << "DFFFile::save() -- Not Supported (no tagging support in DSDIFF)" << std::endl;
     return false;
 }
 
+/*
 TagLib::Tag *DFFFile::tag() const
 {
   return NULL;
 }
-
+*/
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void DFFFile::read(bool readProperties, 
+void DFF::File::read(bool readProperties, 
 		   TagLib::AudioProperties::ReadStyle propertiesStyle)
 {
     if(readProperties) {
-        d->properties = new DFFProperties(this, propertiesStyle);
+        d->properties = new AudioProperties(this);
         d->fileSize = d->properties->fileSize();
     }
 }

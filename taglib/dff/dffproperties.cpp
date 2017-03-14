@@ -21,16 +21,18 @@
 
 #include <stdint.h>
 
-#include <taglib/toolkit/tstring.h>
+#include <tstring.h>
 
 #include "dffproperties.h"
 #include "dfffile.h"
 #include <roon_taglib_utils.h>
 
-class DFFProperties::PropertiesPrivate
+using namespace TagLib;
+
+class DFF::AudioProperties::PropertiesPrivate
 {
 public:
-  PropertiesPrivate(DFFFile *f, ReadStyle s) :
+  PropertiesPrivate(File *f, ReadStyle s) :
     file(f),
     style(s),
     length(0),
@@ -44,7 +46,7 @@ public:
     channelType(0)
    {}
 
-  DFFFile *file;
+  File *file;
   TagLib::AudioProperties::ReadStyle style;
   int length;
   int bitrate;
@@ -62,72 +64,74 @@ public:
 // public members
 ////////////////////////////////////////////////////////////////////////////////
 
-DFFProperties::DFFProperties(DFFFile *file, 
-			     TagLib::AudioProperties::ReadStyle style) 
-  : TagLib::AudioProperties(style)
+DFF::AudioProperties::AudioProperties(File *file, ReadStyle style) :
+  d(new PropertiesPrivate(file, style))
 {
-  d = new PropertiesPrivate(file, style);
-
   if(file && file->isOpen()) 
     read();
 }
 
-DFFProperties::~DFFProperties()
+DFF::AudioProperties::~AudioProperties()
 {
   delete d;
 }
 
-int DFFProperties::length() const
+int DFF::AudioProperties::length() const
+{
+  return lengthInSeconds();
+}
+
+int DFF::AudioProperties::lengthInSeconds() const
 {
   return d->sampleCount / d->sampleRate;
 }
 
-int DFFProperties::lengthMs() const
+int DFF::AudioProperties::lengthInMilliseconds() const
 {
   return (int)(d->sampleCount  * 1000.0 / d->sampleRate);
 }
 
-int DFFProperties::bitrate() const
+int DFF::AudioProperties::bitrate() const
 {
   return d->sampleRate * d->bitsPerSample * d->channels / 1024;
 }
 
-int DFFProperties::sampleRate() const
+int DFF::AudioProperties::sampleRate() const
 {
   return d->sampleRate;
 }
 
-int DFFProperties::channels() const
+int DFF::AudioProperties::channels() const
 {
   return d->channels;
 }
 
-unsigned int DFFProperties::version() const
+unsigned int DFF::AudioProperties::version() const
 {
   return d->version;
 }
 
-unsigned short DFFProperties::channelType() const
+unsigned short DFF::AudioProperties::channelType() const
 {
   return d->channelType;
 }
 
-unsigned long long DFFProperties::fileSize() const
+unsigned long long DFF::AudioProperties::fileSize() const
 {
   return d->fileSize;
 }
 
-unsigned long long DFFProperties::sampleCount() const
+unsigned long long DFF::AudioProperties::sampleCount() const
 {
   return d->sampleCount;
 }
 
-int DFFProperties::bitsPerSample() const
+int DFF::AudioProperties::bitsPerSample() const
 {
   return d->bitsPerSample;
 }
 
-ByteVector DFFProperties::signature() const
+ByteVector DFF::AudioProperties::signature() const
 {
   return d->signature;
 }
@@ -136,14 +140,14 @@ ByteVector DFFProperties::signature() const
 // private members
 ////////////////////////////////////////////////////////////////////////////////
 
-void DFFProperties::read()
+void DFF::AudioProperties::read()
 {
   // Go to the beginning of the file
   d->file->seek(0);
   DFFHeader h(d->file);
 
   if (!h.isValid()) {
-    std::cerr << "DFFProperties::read(): file header is not valid" << std::endl;
+    std::cerr << "DFF::AudioProperties::read(): file header is not valid" << std::endl;
     return;
   }
 
@@ -155,8 +159,8 @@ void DFFProperties::read()
   d->fileSize = h.fileSize();
   d->channelType = h.channelType();
 
-  ulonglong data_start = h.dataStart();
-  ulonglong data_end   = h.dataEnd();
+  unsigned long long data_start = h.dataStart();
+  unsigned long long data_end   = h.dataEnd();
 
   d->signature = taglib_make_signature(d->file, data_start, data_end - data_start);
 }
