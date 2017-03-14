@@ -15,24 +15,24 @@ ByteVector taglib_make_signature(File *f, unsigned long long offset, unsigned lo
     {
         f->seek(offset);
         ByteVector b = f->readBlock(length);
-        if (b.isNull()) return ByteVector::null;
+        //if (b.isNull()) return ByteVector::null;
         sha1.Update((const unsigned char *)b.data(), length);
     }
     else
     {
         f->seek(offset);
         ByteVector b = f->readBlock(CHUNK_SIZE);
-        if (b.isNull()) return ByteVector::null;
+        //if (b.isNull()) return ByteVector::null;
         sha1.Update((const unsigned char *)b.data(), CHUNK_SIZE);
 
         f->seek(offset + length / 2);
         b = f->readBlock(CHUNK_SIZE);
-        if (b.isNull()) return ByteVector::null;
+        //if (b.isNull()) return ByteVector::null;
         sha1.Update((const unsigned char *)b.data(), CHUNK_SIZE);
 
         f->seek(offset + length - CHUNK_SIZE);
         b = f->readBlock(CHUNK_SIZE);
-        if (b.isNull()) return ByteVector::null;
+        //if (b.isNull()) return ByteVector::null;
         sha1.Update((const unsigned char *)b.data(), CHUNK_SIZE);
     }
 
@@ -50,7 +50,7 @@ ByteVector taglib_make_signature(File *f, unsigned long long offset, unsigned lo
     sha1.Final();
 
     unsigned char buf[20];
-    if (!sha1.GetHash(buf)) return ByteVector::null;
+    //if (!sha1.GetHash(buf)) return ByteVector::null;
     ByteVector ret((const char *)buf, sizeof(buf));
     return ret;
 }
@@ -89,7 +89,7 @@ ByteVector taglib_make_signature(const ByteVector &bv)
     sha1.Final();
 
     unsigned char buf[20];
-    if (!sha1.GetHash(buf)) return ByteVector::null;
+    //if (!sha1.GetHash(buf)) return ByteVector::null;
     ByteVector ret((const char *)buf, sizeof(buf));
     return ret;
 }
