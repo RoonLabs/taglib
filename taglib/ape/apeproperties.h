@@ -115,6 +115,7 @@ namespace TagLib {
        */
       int version() const;
 
+      virtual ByteVector signature() const; //dummy, returns an empty vector
     private:
       void read(File *file, long long streamLength);
       void analyzeCurrent(File *file);

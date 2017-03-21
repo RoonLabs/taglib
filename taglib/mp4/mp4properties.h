@@ -106,6 +106,7 @@ namespace TagLib {
 
       String toString() const;
 
+      virtual ByteVector signature() const;
     private:
       void read(File *file, Atoms *atoms);
 

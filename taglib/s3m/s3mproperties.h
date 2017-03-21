@@ -73,6 +73,7 @@ namespace TagLib {
       unsigned char  tempo()             const;
       unsigned char  bpmSpeed()          const;
 
+      ByteVector signature() const;  //not a real implementation
     private:
       void setChannels(int channels);
 

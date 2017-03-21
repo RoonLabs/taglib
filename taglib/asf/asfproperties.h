@@ -160,6 +160,7 @@ namespace TagLib {
        */
       bool isEncrypted() const;
 
+      virtual ByteVector signature() const; //dummy, returns an empty vector
     private:
       void setLengthInMilliseconds(int value);
       void setBitrate(int value);

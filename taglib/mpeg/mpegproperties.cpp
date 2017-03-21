@@ -26,6 +26,7 @@
 #include <tdebug.h>
 #include <tstring.h>
 #include <tsmartptr.h>
+#include <roon_taglib_utils.h>
 
 #include "mpegproperties.h"
 #include "mpegfile.h"
@@ -61,6 +62,7 @@ public:
   bool protectionEnabled;
   bool isCopyrighted;
   bool isOriginal;
+  ByteVector signature;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,6 +144,11 @@ bool MPEG::AudioProperties::isCopyrighted() const
 bool MPEG::AudioProperties::isOriginal() const
 {
   return d->isOriginal;
+}
+
+ByteVector MPEG::AudioProperties::signature() const
+{
+  return d->signature;
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -231,4 +238,5 @@ void MPEG::AudioProperties::read(File *file)
   d->channelMode       = firstHeader.channelMode();
   d->isCopyrighted     = firstHeader.isCopyrighted();
   d->isOriginal        = firstHeader.isOriginal();
+  d->signature         = taglib_make_signature(file, firstFrameOffset, file->lastFrameOffset() - firstFrameOffset);
 }

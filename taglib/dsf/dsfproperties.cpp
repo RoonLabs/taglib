@@ -25,6 +25,7 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+#include <roon_taglib_utils.h>
 
 #include "dsfproperties.h"
 
@@ -58,6 +59,7 @@ public:
   // Computed
   int bitrate;
   int length;
+  ByteVector signature;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -136,6 +138,11 @@ int DSF::AudioProperties::blockSizePerChannel() const
   return d->blockSizePerChannel;
 }
 
+ByteVector DSF::AudioProperties::signature() const
+{
+  return d->signature;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -154,5 +161,11 @@ void DSF::AudioProperties::read(const ByteVector &data)
   d->bitrate = static_cast<int>(d->samplingFrequency * d->bitsPerSample * d->channelNum / 1000.0 + 0.5);
 
   if(d->samplingFrequency > 0)
-    d->length = static_cast<int>(d->sampleCount * 1000.0 / d->samplingFrequency + 0.5);
+      d->length = static_cast<int>(d->sampleCount * 1000.0 / d->samplingFrequency + 0.5);
+  
+  const size_t FMT_HEADER_SIZE = 52;
+
+  
+  d->signature = taglib_make_signature(data.mid(FMT_HEADER_SIZE, (data.size() - FMT_HEADER_SIZE)));
+  
 }

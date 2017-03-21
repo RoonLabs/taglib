@@ -141,7 +141,8 @@ namespace TagLib {
          * \see isAiffC()
          */
         String compressionName() const;
-
+        
+        virtual ByteVector signature() const;
       private:
         void read(File *file);
 

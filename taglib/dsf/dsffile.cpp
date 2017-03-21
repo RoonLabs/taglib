@@ -31,6 +31,7 @@
 
 #include "dsffile.h"
 
+
 using namespace TagLib;
 
 // The DSF specification is located at http://dsd-guide.com/sites/default/files/white-papers/DSFFileFormatSpec_E.pdf
@@ -167,6 +168,7 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
   }
 
   long long chunkSize = readBlock(8).toInt64LE(0);
+  const int DSD_HEADER_SIZE = chunkSize;
 
   // Integrity check
   if(28 != chunkSize) {
@@ -203,10 +205,11 @@ void DSF::File::read(bool readProperties, AudioProperties::ReadStyle propertiesS
 
   chunkSize = readBlock(8).toInt64LE(0);
 
-  d->properties
-    = new AudioProperties(readBlock(static_cast<size_t>(chunkSize)), propertiesStyle);
+  long long data_end = (d->metadataOffset == 0) ? d->fileSize : d->metadataOffset;
+  data_end -= DSD_HEADER_SIZE;
 
-  // Skip the data chunk
+  d->properties
+    = new AudioProperties(readBlock(static_cast<size_t>(data_end)), propertiesStyle);
 
   // A metadata offset of 0 indicates the absence of an ID3v2 tag
   if(0 == d->metadataOffset)

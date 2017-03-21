@@ -25,6 +25,7 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+#include <roon_taglib_utils.h>
 #include "aifffile.h"
 #include "aiffproperties.h"
 
@@ -51,6 +52,7 @@ public:
   String compressionName;
 
   unsigned int sampleFrames;
+  ByteVector signature;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -134,6 +136,11 @@ String RIFF::AIFF::AudioProperties::compressionName() const
   return d->compressionName;
 }
 
+ByteVector RIFF::AIFF::AudioProperties::signature() const
+{
+  return d->signature;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,6 +158,7 @@ void RIFF::AIFF::AudioProperties::read(File *file)
         debug("RIFF::AIFF::AudioProperties::read() - Duplicate 'COMM' chunk found.");
     }
     else if(name == "SSND") {
+      d->signature = taglib_make_signature(file->chunkData(i));
       if(streamLength == 0)
         streamLength = file->chunkDataSize(i) + file->chunkPadding(i);
       else

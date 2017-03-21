@@ -63,7 +63,8 @@ namespace TagLib {
       virtual int bitrate() const;
       virtual int sampleRate() const;
       virtual int channels() const;
-
+      virtual ByteVector signature() const;
+      
       int formatVersion() const;
       int formatID() const;
       int channelType() const;

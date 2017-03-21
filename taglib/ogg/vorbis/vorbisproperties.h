@@ -128,6 +128,8 @@ namespace TagLib {
        */
       int bitrateMinimum() const;
 
+      virtual ByteVector signature() const;
+
     private:
       void read(File *file);
 

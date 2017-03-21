@@ -84,6 +84,7 @@ namespace TagLib {
       unsigned char  panningSeparation() const;
       unsigned char  pitchWheelDepth()   const;
 
+      virtual ByteVector signature() const; //dummy, returns an empty vector
     private:
       void setChannels(int channels);
       void setLengthInPatterns(unsigned short lengthInPatterns);

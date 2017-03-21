@@ -135,6 +135,7 @@ namespace TagLib {
        */
       bool isOriginal() const;
 
+      virtual ByteVector signature() const;
     private:
       void read(File *file);
 

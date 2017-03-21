@@ -114,6 +114,7 @@ namespace TagLib {
        */
       int ttaVersion() const;
 
+      ByteVector signature() const;  //not a real implementation
     private:
       void read(const ByteVector &data, long long streamLength);
 

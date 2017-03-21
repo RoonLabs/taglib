@@ -25,6 +25,7 @@
 
 #include <tstring.h>
 #include <tdebug.h>
+#include <roon_taglib_utils.h>
 
 #include "wavfile.h"
 #include "wavproperties.h"
@@ -60,6 +61,7 @@ public:
   int channels;
   int bitsPerSample;
   unsigned int sampleFrames;
+  ByteVector signature;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -128,6 +130,11 @@ int RIFF::WAV::AudioProperties::format() const
   return d->format;
 }
 
+ByteVector RIFF::WAV::AudioProperties::signature() const
+{
+  return d->signature;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -147,6 +154,7 @@ void RIFF::WAV::AudioProperties::read(File *file)
         debug("RIFF::WAV::AudioProperties::read() - Duplicate 'fmt ' chunk found.");
     }
     else if(name == "data") {
+      d->signature = taglib_make_signature(file->chunkData(i));
       if(streamLength == 0)
         streamLength = file->chunkDataSize(i) + file->chunkPadding(i);
       else

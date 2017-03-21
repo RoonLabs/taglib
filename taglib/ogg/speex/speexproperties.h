@@ -111,6 +111,7 @@ namespace TagLib {
          */
         int speexVersion() const;
 
+        ByteVector signature() const;  //not actually implemented
       private:
         void read(File *file);
 

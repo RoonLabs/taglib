@@ -107,6 +107,8 @@ namespace TagLib {
      */
     virtual String toString() const;
 
+    virtual ByteVector signature() const = 0;
+    
   protected:
 
     /*!

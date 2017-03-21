@@ -53,6 +53,7 @@ namespace TagLib {
       unsigned int  instrumentCount()  const;
       unsigned char lengthInPatterns() const;
 
+      virtual ByteVector signature() const; //dummy, returns an empty vector
     private:
       void setChannels(int channels);
 

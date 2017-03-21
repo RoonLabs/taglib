@@ -42,6 +42,7 @@ public:
 
   unsigned int frames;
   unsigned int size;
+  String encoder;
 
   MPEG::XingHeader::HeaderType type;
 };
@@ -110,6 +111,9 @@ void MPEG::XingHeader::parse(const ByteVector &data)
     d->frames = data.toUInt32BE(offset + 8);
     d->size   = data.toUInt32BE(offset + 12);
     d->type   = Xing;
+
+    if (data.size() >= 140 && data.mid(offset + 120, 9).startsWith("LAME"))
+      d->encoder = data.mid(offset + 120, 9);
   }
   else {
 

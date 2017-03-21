@@ -121,6 +121,7 @@ namespace TagLib {
        */
       int version() const;
 
+      ByteVector signature() const;  //not a real implementation
     private:
       void read(File *file, long long streamLength);
       unsigned int seekFinalIndex(File *file, long long streamLength);

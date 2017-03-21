@@ -101,6 +101,11 @@ namespace TagLib {
       unsigned int totalSize() const;
 
       /*!
+       * Returns the Lame encoder info, if any.
+       */
+      String encoderInfo() const;
+
+      /*!
        * Returns the type of the VBR header.
        */
       HeaderType type() const;

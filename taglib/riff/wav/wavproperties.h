@@ -133,6 +133,7 @@ namespace TagLib {
          */
         int format() const;
 
+        ByteVector signature() const;
       private:
         void read(File *file);
 

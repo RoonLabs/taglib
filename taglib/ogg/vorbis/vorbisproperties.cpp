@@ -27,6 +27,7 @@
 #include <tdebug.h>
 
 #include <oggpageheader.h>
+#include <roon_taglib_utils.h>
 
 #include "vorbisproperties.h"
 #include "vorbisfile.h"
@@ -54,6 +55,7 @@ public:
   int bitrateMaximum;
   int bitrateNominal;
   int bitrateMinimum;
+  ByteVector signature;
 };
 
 namespace TagLib {
@@ -137,6 +139,11 @@ String Ogg::Vorbis::AudioProperties::toString() const
   desc.append(String::number(length()) + " seconds");
   desc.append(String::number(bitrate()) + " kbps");
   return desc.toString(", ");
+}
+
+ByteVector Ogg::Vorbis::AudioProperties::signature() const
+{
+  return d->signature;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

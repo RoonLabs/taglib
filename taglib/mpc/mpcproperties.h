@@ -130,6 +130,7 @@ namespace TagLib {
       */
       int albumPeak() const;
 
+      ByteVector signature() const;  //not actually implemented
     private:
       void readSV7(const ByteVector &data, long long streamLength);
       void readSV8(File *file, long long streamLength);

@@ -28,6 +28,7 @@
 #include "mp4file.h"
 #include "mp4atom.h"
 #include "mp4properties.h"
+#include <roon_taglib_utils.h>
 
 using namespace TagLib;
 
@@ -50,6 +51,7 @@ public:
   int bitsPerSample;
   bool encrypted;
   Codec codec;
+  ByteVector signature;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,6 +144,11 @@ MP4::AudioProperties::toString() const
   return desc.toString(", ");
 }
 
+ByteVector MP4::AudioProperties::signature() const
+{
+  return d->signature;
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // private members
 ////////////////////////////////////////////////////////////////////////////////
@@ -153,6 +160,13 @@ MP4::AudioProperties::read(File *file, Atoms *atoms)
   if(!moov) {
     debug("MP4: Atom 'moov' not found");
     return;
+  }
+
+  MP4::Atom *mdat = atoms->find("mdat");
+  if(!mdat) {
+      debug("MP4: Atom 'mdat' not found");
+  } else {
+      d->signature = taglib_make_signature(file, mdat->offset, mdat->length);
   }
 
   MP4::Atom *trak = 0;
