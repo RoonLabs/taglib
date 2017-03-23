@@ -468,14 +468,6 @@ void FLAC::File::scan()
     const bool isLastBlock = (header[0] & LastBlockFlag) != 0;
     const size_t blockLength = header.toUInt24BE(1);
 
-    // First block should be the stream_info metadata
-
-    if(d->blocks.isEmpty() && blockType != MetadataBlock::StreamInfo) {
-      debug("FLAC::File::scan() -- First block should be the stream_info metadata");
-      setValid(false);
-      return;
-    }
-
     if(blockLength == 0 && blockType != MetadataBlock::Padding) {
       debug("FLAC::File::scan() -- Zero-sized metadata block found");
       setValid(false);
@@ -491,8 +483,11 @@ void FLAC::File::scan()
 
     MetadataBlock *block = 0;
 
-    // Found the vorbis-comment
-    if(blockType == MetadataBlock::VorbisComment) {
+    if (blockType == MetadataBlock::StreamInfo) {
+      //d->streamInfoData = data;
+      d->blocks.append(new UnknownMetadataBlock(blockType, data));
+    }
+    else if(blockType == MetadataBlock::VorbisComment) {
       if(d->xiphCommentData.isEmpty()) {
         d->xiphCommentData = data;
         block = new UnknownMetadataBlock(MetadataBlock::VorbisComment, data);
