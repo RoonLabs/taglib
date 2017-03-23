@@ -69,6 +69,21 @@ MP4::Atom::Atom(File *file)
     return;
   }
 
+  // if atom length is longer than what remains to be read in the file, we are probably dealing with
+  // trailing garbage or a truncated file. ignore the rest of the file.
+  if(((unsigned long long)length + offset) > file->length()) {
+    if (header.mid(4, 4) == "mdat") {
+      // we ran into some files where the audio portion was longer than the rest of the file.
+      // just clip length to file end. this is safe because 'mdat' is usually at the end of the
+      // file and important because if we exclude this atom we won't be able to produce an audio
+      // signature.
+      length = file->length() - offset;
+    } else {
+      length = 0;
+      return;
+    }
+  }
+  
   name = header.mid(4, 4);
 
   for(int i = 0; i < numContainers; i++) {
@@ -149,9 +164,9 @@ MP4::Atoms::Atoms(File *file)
   file->seek(0);
   while(file->tell() + 8 <= end) {
     MP4::Atom *atom = new MP4::Atom(file);
-    atoms.append(atom);
     if (atom->length == 0)
       break;
+    atoms.append(atom);
   }
 }
 
