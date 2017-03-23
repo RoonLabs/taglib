@@ -101,7 +101,8 @@ void TextIdentificationFrame::setText(const String &s)
 
 String TextIdentificationFrame::toString() const
 {
-  return d->fieldList.toString();
+  // Added semicolon, since default delimiter is ' ' and this was mushing up artist strings
+  return d->fieldList.toString("; ");
 }
 
 StringList TextIdentificationFrame::fieldList() const
@@ -338,7 +339,7 @@ UserTextIdentificationFrame::UserTextIdentificationFrame(const String &descripti
 
 String UserTextIdentificationFrame::toString() const
 {
-  return "[" + description() + "] " + fieldList().toString();
+  return "[" + description() + "] " + fieldList().toString("; ");
 }
 
 String UserTextIdentificationFrame::description() const
