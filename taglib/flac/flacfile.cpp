@@ -517,7 +517,12 @@ void FLAC::File::scan()
       d->blocks.append(block);
 
     nextBlockOffset += blockLength + 4;
-
+    if(nextBlockOffset == File::length() && isLastBlock) {
+      debug("FLAC::File::scan() -- FLAC has no datastream");
+      setValid(false);
+      return;
+    }
+    
     if(isLastBlock)
       break;
   }
