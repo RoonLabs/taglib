@@ -39,10 +39,10 @@ namespace
 {
   struct Chunk
   {
-    ByteVector   name;
-    long long    offset;
-    unsigned int size;
-    unsigned int padding;
+    ByteVector         name;
+    long long          offset;
+    unsigned long long size;
+    unsigned int       padding;
   };
 
   unsigned int toUInt32(const ByteVector &v, size_t offset, ByteOrder endian)
@@ -72,7 +72,7 @@ public:
 
   const ByteOrder endianness;
 
-  unsigned int size;
+  unsigned long long size;
   long long sizeOffset;
 
   std::vector<Chunk> chunks;
@@ -107,7 +107,7 @@ RIFF::File::File(IOStream *stream, ByteOrder endianness) :
     read();
 }
 
-unsigned int RIFF::File::riffSize() const
+unsigned long long RIFF::File::riffSize() const
 {
   return d->size;
 }
@@ -117,7 +117,7 @@ size_t RIFF::File::chunkCount() const
   return d->chunks.size();
 }
 
-unsigned int RIFF::File::chunkDataSize(unsigned int i) const
+unsigned long long RIFF::File::chunkDataSize(unsigned int i) const
 {
   if(i >= d->chunks.size()) {
     debug("RIFF::File::chunkPadding() - Index out of range. Returning 0.");
