@@ -60,6 +60,15 @@ namespace
     else
       return ByteVector::fromUInt32LE(value);
   }
+
+  unsigned long long toUInt64(const ByteVector &v, size_t offset, ByteOrder endian)
+  {
+    if(endian == BigEndian)
+      return v.toUInt64BE(offset);
+    else
+      return v.toUInt64LE(offset);
+  }
+
 }
 
 class RIFF::File::FilePrivate
@@ -71,7 +80,7 @@ public:
     sizeOffset(0) {}
 
   const ByteOrder endianness;
-
+  ByteVector type;
   unsigned long long size;
   long long sizeOffset;
 
@@ -300,55 +309,121 @@ void RIFF::File::removeChunk(const ByteVector &name)
 
 void RIFF::File::read()
 {
-  long long offset = tell();
+  // note: if at any point we decide file is unreadable, we want to just bail without parsing any chunks.
 
-  offset += 4;
-  d->sizeOffset = offset;
+  d->type = readBlock(4);
 
-  seek(offset);
-  d->size = toUInt32(readBlock(4), 0, d->endianness);
+  if (d->type == fromUInt32(0x72696666, BigEndian) && length() >= 40) { // sony wav64
 
-  offset += 8;
+    const char _riff_guid[] = { 0x72, 0x69, 0x66, 0x66, 0x2e, 0x91, 0xcf, 0x11, 0xa5, 0xd6, 0x28, 0xdb, 0x04, 0xc1, 0x00, 0x00 };
+    const char _wave_guid[] = { 0x77, 0x61, 0x76, 0x65, 0xf3, 0xac, 0xd3, 0x11, 0x8c, 0xd1, 0x00, 0xc0, 0x4f, 0x8e, 0xdb, 0x8a };
+    const char _fmt_guid[]  = { 0x66, 0x6d, 0x74, 0x20, 0xf3, 0xac, 0xd3, 0x11, 0x8c, 0xd1, 0x00, 0xc0, 0x4f, 0x8e, 0xdb, 0x8a };
+    const char _data_guid[] = { 0x64, 0x61, 0x74, 0x61, 0xf3, 0xac, 0xd3, 0x11, 0x8c, 0xd1, 0x00, 0xc0, 0x4f, 0x8e, 0xdb, 0x8a };
 
-  // + 8: chunk header at least, fix for additional junk bytes
-  while(offset + 8 <= length()) {
+    ByteVector riff_guid(_riff_guid, 16);
+    ByteVector wave_guid(_wave_guid, 16);
+    ByteVector fmt_guid(_fmt_guid, 16);
+    ByteVector data_guid(_data_guid, 16);
+
+    // ensure the remainder of the riff guid is there
+    if (readBlock(12) != riff_guid.mid(4, 12)) return;
+    // grab size
+    ulong size = readBlock(8).toUInt64LE(0);
+    // ensure the the wave guid is there
+    if (readBlock(16) != wave_guid) return;
+
+    d->size = size - 40; // size in wav64 includes header. remove to be compatible with standard wav.
+
+    // + 8: chunk header at least, fix for additional junk bytes
+    while (tell() + 24 <= length()) {
+      ByteVector chunkGuid = readBlock(16);
+      ByteVector chunkName = chunkGuid.mid(0, 4);
+      ulong chunkSize = readBlock(8).toUInt64LE(0) - 24;
+
+      if(!isValidChunkName(chunkName)) {
+        debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
+        setValid(false);
+        break;
+      }
+      if(tell() + chunkSize > ulong(length())) {
+        debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
+        setValid(false);
+        break;
+      }
+
+      Chunk chunk;
+      chunk.name = chunkName;
+      chunk.size = chunkSize;
+      chunk.offset = tell();
+
+      seek(chunk.size, Current);
+
+      // check padding
+      chunk.padding = 0;
+      ulong uPosNotPadded = tell();
+      if((uPosNotPadded & 0x01) != 0) {
+        ByteVector iByte = readBlock(1);
+        if((iByte.size() != 1) || (iByte[0] != 0)) {
+          // not well formed, re-seek
+          seek(uPosNotPadded, Beginning);
+        }
+        else {
+          chunk.padding = 1;
+        }
+      }
+      d->chunks.push_back(chunk);
+    }
+  }
+  else { // standard wav or aiff
+    long long offset = tell();
+
+    d->sizeOffset = offset;
 
     seek(offset);
-    const ByteVector   chunkName = readBlock(4);
-    const unsigned int chunkSize = toUInt32(readBlock(4), 0, d->endianness);
+    d->size = toUInt32(readBlock(4), 0, d->endianness);
 
-    if(!isValidChunkName(chunkName)) {
-      debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
-      setValid(false);
-      break;
-    }
+    offset += 8;
 
-    if(offset + 8 + chunkSize > length()) {
-      debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
-      setValid(false);
-      break;
-    }
+    // + 8: chunk header at least, fix for additional junk bytes
+    while(offset + 8 <= length()) {
 
-    Chunk chunk;
-    chunk.name    = chunkName;
-    chunk.size    = chunkSize;
-    chunk.offset  = offset + 8;
-    chunk.padding = 0;
-
-    offset = chunk.offset + chunk.size;
-
-    // Check padding
-
-    if(offset & 1) {
       seek(offset);
-      const ByteVector iByte = readBlock(1);
-      if(iByte.size() == 1 && iByte[0] == '\0') {
-        chunk.padding = 1;
-        offset++;
-      }
-    }
+      const ByteVector   chunkName = readBlock(4);
+      const unsigned int chunkSize = toUInt32(readBlock(4), 0, d->endianness);
 
-    d->chunks.push_back(chunk);
+      if(!isValidChunkName(chunkName)) {
+        debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid ID");
+        setValid(false);
+        break;
+      }
+
+      if(offset + 8 + chunkSize > length()) {
+        debug("RIFF::File::read() -- Chunk '" + chunkName + "' has invalid size (larger than the file size)");
+        setValid(false);
+        break;
+      }
+
+      Chunk chunk;
+      chunk.name    = chunkName;
+      chunk.size    = chunkSize;
+      chunk.offset  = offset + 8;
+      chunk.padding = 0;
+
+      offset = chunk.offset + chunk.size;
+
+      // Check padding
+
+      if(offset & 1) {
+        seek(offset);
+        const ByteVector iByte = readBlock(1);
+        if(iByte.size() == 1 && iByte[0] == '\0') {
+          chunk.padding = 1;
+          offset++;
+        }
+      }
+
+      d->chunks.push_back(chunk);
+    }
   }
 }
 

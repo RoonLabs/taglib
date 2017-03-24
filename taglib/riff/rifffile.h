@@ -58,7 +58,7 @@ namespace TagLib {
       /*!
        * \return The size of the main RIFF chunk.
        */
-      unsigned int riffSize() const;
+      unsigned long long riffSize() const;
 
       /*!
        * \return The number of chunks in the file.
@@ -73,7 +73,7 @@ namespace TagLib {
       /*!
        * \return The size of the chunk data.
        */
-      unsigned int chunkDataSize(unsigned int i) const;
+      unsigned long long chunkDataSize(unsigned int i) const;
 
       /*!
        * \return The size of the padding after the chunk (can be either 0 or 1).

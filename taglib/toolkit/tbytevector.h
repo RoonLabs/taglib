@@ -344,12 +344,15 @@ namespace TagLib {
      */
     unsigned int toUInt32BE(size_t offset) const;
 
+    unsigned long long toUInt64LE(size_t offset) const;
+    unsigned long long toUInt64BE(size_t offset) const;
+    
     /*!
      * Converts the 8 bytes at \a offset of the vector to a long long as a signed
      * 64-bit little-endian integer.
      *
      * \see fromUInt64LE()
-     */
+     */    
     long long toInt64LE(size_t offset) const;
 
     /*!

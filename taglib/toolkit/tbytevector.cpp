@@ -758,6 +758,16 @@ unsigned int ByteVector::toUInt32BE(size_t offset) const
   return toNumber<unsigned int, 4, BigEndian>(*this, offset);
 }
 
+unsigned long long ByteVector::toUInt64LE(size_t offset) const
+{
+  return toNumber<unsigned long long, 8, LittleEndian>(*this, offset);
+}
+
+unsigned long long ByteVector::toUInt64BE(size_t offset) const
+{
+  return toNumber<unsigned long long, 8, BigEndian>(*this, offset);
+}
+
 long long ByteVector::toInt64LE(size_t offset) const
 {
   return static_cast<long long>(toNumber<unsigned long long, 8, LittleEndian>(*this, offset));
