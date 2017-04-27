@@ -88,12 +88,12 @@ bool DFF::File::save()
     return false;
 }
 
-/*
-TagLib::Tag *DFFFile::tag() const
+
+TagLib::Tag *DFF::File::tag() const
 {
   return NULL;
 }
-*/
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members

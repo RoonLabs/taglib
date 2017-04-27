@@ -122,6 +122,11 @@ bool ASF::AudioProperties::isEncrypted() const
   return d->encrypted;
 }
 
+ByteVector ASF::AudioProperties::signature() const
+{
+  return ByteVector();
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////
 // private members
